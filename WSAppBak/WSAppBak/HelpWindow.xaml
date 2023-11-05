@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="WSAppBak.HelpWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:WSAppBak"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+
+    <Window.SystemBackdrop>
+        <MicaBackdrop></MicaBackdrop>
+    </Window.SystemBackdrop>
+
+    <Grid>
+        <ScrollViewer>
+            <RichTextBlock xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+                <Paragraph Margin="350,0,0,0" >
+                    <Run FontWeight="Bold" FontSize="24" Foreground="AntiqueWhite" >Instructions</Run>
+                </Paragraph>
+
+                <Paragraph FontSize="16" Margin="16,20,10,0">
+                    <Run FontWeight="Bold" Foreground="Wheat">► Getting Application:</Run>
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Copy the Application Link (From Microsoft Store)
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Go to
+                    <Hyperlink NavigateUri="https://store.rg-adguard.net/" Foreground="RoyalBlue">https://store.rg-adguard.net/</Hyperlink>
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Paste the Application Link
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Download the File with the largest size
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Install the Application
+                </Paragraph>
+
+                <Paragraph FontSize="16" Margin="16,20,10,0">
+                    <Run FontWeight="Bold" Foreground="Wheat">► Crack and Install Application:</Run>
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Copy the AppFolder Path, usually in "C:\Program Files\WindowsApps\'AppFolder'" (Note: Select AppFolder with the largest size)
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Run "WSAppBak.exe" as Admin
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Paste the Copied Path
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Enter the Output path and Hit Enter
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> A Window will pop up 'Create Private Key Password', Select None (Recommended)
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Uninstall Previously Installed Application
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Install Dependencies depending on your Architecture (if required)
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Install Certificates (in Output Folder)
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Copy 'WSAppPkgIns.exe' file to 'C:\Windows\System32'
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Install the App (.appx) using 'WSAppPkgIns.exe' that was copied in the previous step (Use: Open With > )
+                </Paragraph>
+
+                <Paragraph FontSize="16" Margin="16,20,10,0">
+                    <Run FontWeight="Bold" Foreground="Wheat">● If you encounter any Error at Step 10, You should try this Method:</Run>
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Open Properties of .appx file
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Go to 'Digital Signatures' Tab
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Select Certificate from the list
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Click 'Details', then click 'View Certificate'
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Click Install > Local Machine > Next
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Select Second Option > Browse
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Select 'Trusted People' and Click OK
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Click 'Finish' to Install Certificate
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Repeat Installation Steps if there are Multiple Certificates in the List
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Now, Simply just Install Application
+                </Paragraph>
+                <Paragraph Margin="40,0,0,0">
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> You can also Skip Step 08
+                </Paragraph>
+                <Paragraph Margin="40,0,30,0"> </Paragraph>
+            </RichTextBlock>
+        </ScrollViewer>
+    </Grid>
+</Window>
