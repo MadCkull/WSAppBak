@@ -25,10 +25,10 @@ WSAPPBak is a powerful and user-friendly WinUI 3 Windows application designed to
 
 ### Installation
 
-1. Download the latest release from [GitHub Releases](https://github.com/MadCkull/WSAppBak/releases) page. (Not Working yet)
+1. Download the latest release from [GitHub Releases](https://github.com/MadCkull/WSAppBak/releases) page. **(Not Working yet)**
    #### Try This:
 1. Clone Repo or Download Zip
-2. Open in solution VS Studio
+2. Open solution in Visual Studio
 3. Run.
 
 ## 📘 Usage Guide
