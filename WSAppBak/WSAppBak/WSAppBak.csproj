@@ -11,6 +11,112 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="HelpWindow.xaml" />
+    <None Remove="WSTools\appxpackaging.dll" />
+    <None Remove="WSTools\appxsip.dll" />
+    <None Remove="WSTools\makeappx.exe" />
+    <None Remove="WSTools\MakeAppx.exe.manifest" />
+    <None Remove="WSTools\makecert.exe" />
+    <None Remove="WSTools\mfdetours.dll" />
+    <None Remove="WSTools\Microsoft.Diagnostics.Tracing.EventSource.dll" />
+    <None Remove="WSTools\Microsoft.Windows.Build.Appx.AppxPackaging.dll.manifest" />
+    <None Remove="WSTools\Microsoft.Windows.Build.Appx.AppxSip.dll.manifest" />
+    <None Remove="WSTools\Microsoft.Windows.Build.Appx.OpcServices.dll.manifest" />
+    <None Remove="WSTools\Microsoft.Windows.Build.Signing.mssign32.dll.manifest" />
+    <None Remove="WSTools\Microsoft.Windows.Build.Signing.wintrust.dll.manifest" />
+    <None Remove="WSTools\midlrtmd.dll" />
+    <None Remove="WSTools\mrmsupport.dll" />
+    <None Remove="WSTools\msisip.dll" />
+    <None Remove="WSTools\mssign32.dll" />
+    <None Remove="WSTools\opcservices.dll" />
+    <None Remove="WSTools\provisioningtesthelper.dll" />
+    <None Remove="WSTools\ProvisioningTestHelper.psd1" />
+    <None Remove="WSTools\pvk2pfx.exe" />
+    <None Remove="WSTools\signtool.exe" />
+    <None Remove="WSTools\signtool.exe.manifest" />
+    <None Remove="WSTools\tedutil.dll" />
+    <None Remove="WSTools\wintrust.dll" />
+    <None Remove="WSTools\wintrust.dll.ini" />
+    <None Remove="WSTools\wsutilhelper.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="WSTools\appxpackaging.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\appxsip.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\makeappx.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\MakeAppx.exe.manifest">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\makecert.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\mfdetours.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\Microsoft.Diagnostics.Tracing.EventSource.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\Microsoft.Windows.Build.Appx.AppxPackaging.dll.manifest">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\Microsoft.Windows.Build.Appx.AppxSip.dll.manifest">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\Microsoft.Windows.Build.Appx.OpcServices.dll.manifest">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\Microsoft.Windows.Build.Signing.mssign32.dll.manifest">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\Microsoft.Windows.Build.Signing.wintrust.dll.manifest">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\midlrtmd.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\mrmsupport.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\msisip.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\mssign32.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\opcservices.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\provisioningtesthelper.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\ProvisioningTestHelper.psd1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\pvk2pfx.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\signtool.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\signtool.exe.manifest">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\tedutil.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\wintrust.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\wintrust.dll.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WSTools\wsutilhelper.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
