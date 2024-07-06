@@ -5,7 +5,7 @@
 
 WSAPPBak is a powerful and user-friendly WinUI 3 Windows application designed to Crack paid Windows Application. And Backup Application along with Certificates.
 
-![WSAPPBak Demo](https://via.placeholder.com/600x300.png?text=WSAPPBak+Demo+GIF)
+![WSAPPBak Demo](WSAppBak/WSAppBak/Assets/WSAppBak_Preview.png)
 
 ## 🚀 Key Features
 
