@@ -11,6 +11,14 @@ using Windows.Storage;
 using WinRT;
 using Microsoft.UI;
 using WinRT.Interop;
+using System.Collections.Generic;
+using Windows.Management.Deployment;
+
+using System.Linq;
+using Windows.ApplicationModel;
+
+using Windows.Storage.Streams;
+
 
 namespace WSAppBak
 {
@@ -21,6 +29,8 @@ namespace WSAppBak
         private const string WSAppXmlFile = "AppxManifest.xml";
 
         private readonly string _appCurrentDir = AppContext.BaseDirectory;
+
+        private string SelectedAppPath;
 
 
         private WSAppInfo _wsAppInfo;
@@ -38,9 +48,8 @@ namespace WSAppBak
             ExtendsContentIntoTitleBar = true;
             SetTitleBar(AppTitleBar);
 
-            //Tmp
+            LoadInstalledAppsAsync();
 
-            InputPath.Text = "C:\\Program Files\\WindowsApps\\42742filesuite.PDFreaderforadobeacrobat_1.2.3.0_x64__1cyam58dzt1cw";
             OutputPath.Text = "D:\\Other\\WSAPPOutput";
         }
 
@@ -67,25 +76,61 @@ namespace WSAppBak
             //File.AppendAllText(_logFilePath, $"DirectoryPath: {currentDir}\nFull Name: {rootPath}\nParent: {parentPath}\n");
         }
 
-        private async void InputPath_DragEnter(object sender, DragEventArgs args)
+
+        //Fetching App Installed List
+
+
+        private async Task LoadInstalledAppsAsync()
         {
-            args.AcceptedOperation = args.DataView.Contains(StandardDataFormats.StorageItems)
-                ? DataPackageOperation.Copy
-                : DataPackageOperation.None;
+            var installedApps = await GetInstalledAppsAsync();
+            InstalledAppsComboBox.ItemsSource = installedApps;
         }
 
-        private async void InputPath_Drop(object sender, DragEventArgs args)
+        private async Task<List<InstalledApp>> GetInstalledAppsAsync()
         {
-            if (args.DataView.Contains(StandardDataFormats.StorageItems))
+            var packageManager = new PackageManager();
+            var packages = packageManager.FindPackagesForUser(string.Empty);
+
+            var installedApps = new List<InstalledApp>();
+
+            foreach (var package in packages)
             {
-                var items = await args.DataView.GetStorageItemsAsync();
-                if (items.Count == 1 && items[0] is StorageFolder folder)
+                try
                 {
-                    InputPath.Text = folder.Path;
+                    var manifestPath = Path.Combine(package.InstalledLocation.Path, "AppxManifest.xml");
+                    if (File.Exists(manifestPath))
+                    {
+                        installedApps.Add(new InstalledApp
+                        {
+                            Name = package.DisplayName,
+                            ManifestPath = manifestPath
+                        });
+                    }
+                }
+                catch (Exception)
+                {
+                    // Skip packages that we can't access
                 }
             }
-            InfoText.Text = string.Empty;
+
+            return installedApps.OrderBy(app => app.Name).ToList();
         }
+
+
+        private void InstalledAppsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (InstalledAppsComboBox.SelectedItem is InstalledApp selectedApp)
+            {
+                SelectedAppPath = selectedApp.ManifestPath.Substring(0, selectedApp.ManifestPath.LastIndexOf('\\'));
+                SelectedPathTextBlock.Text = $"Selected App Path: {SelectedAppPath}";
+            }
+        }
+
+
+
+
+
+
 
         private async void StartButton_Click(object sender, RoutedEventArgs e)
         {
@@ -120,7 +165,7 @@ namespace WSAppBak
         {
             InfoText.Text = "Reading Arguments.";
 
-            var wsAppPath = InputPath.Text.Trim('"');
+            var wsAppPath = SelectedAppPath;
             var wsAppOutputPath = OutputPath.Text.Trim('"');
 
             if (!File.Exists(Path.Combine(wsAppPath, WSAppXmlFile)))
@@ -280,6 +325,18 @@ namespace WSAppBak
             await process.WaitForExitAsync();
 
             return output;
+        }
+    }
+
+
+    public class InstalledApp
+    {
+        public string Name { get; set; }
+        public string ManifestPath { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
         }
     }
 
