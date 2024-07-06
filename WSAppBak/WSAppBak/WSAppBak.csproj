@@ -126,7 +126,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="Assets\WSAppBak %28Preview%29.png">
+    <Content Update="Assets\WSAppBak_Preview.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
