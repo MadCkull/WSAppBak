@@ -18,6 +18,7 @@ using System.Linq;
 using Windows.ApplicationModel;
 
 using Windows.Storage.Streams;
+using Microsoft.UI.Xaml.Media.Imaging;
 
 
 namespace WSAppBak
@@ -31,6 +32,7 @@ namespace WSAppBak
         private readonly string _appCurrentDir = AppContext.BaseDirectory;
 
         private string SelectedAppPath;
+        private List<InstalledApp> AllInstalledApps;
 
 
         private WSAppInfo _wsAppInfo;
@@ -44,7 +46,7 @@ namespace WSAppBak
 
         private void InitializeWindow()
         {
-            SetWindowSize(1800, 900, false);
+            SetWindowSize(1800, 950, false);
             ExtendsContentIntoTitleBar = true;
             SetTitleBar(AppTitleBar);
 
@@ -82,8 +84,8 @@ namespace WSAppBak
 
         private async Task LoadInstalledAppsAsync()
         {
-            var installedApps = await GetInstalledAppsAsync();
-            InstalledAppsComboBox.ItemsSource = installedApps;
+            AllInstalledApps = await GetInstalledAppsAsync();
+            AppSearchBox.ItemsSource = AllInstalledApps;
         }
 
         private async Task<List<InstalledApp>> GetInstalledAppsAsync()
@@ -100,10 +102,12 @@ namespace WSAppBak
                     var manifestPath = Path.Combine(package.InstalledLocation.Path, "AppxManifest.xml");
                     if (File.Exists(manifestPath))
                     {
+                        var logoPath = await GetAppLogoPathAsync(package);
                         installedApps.Add(new InstalledApp
                         {
                             Name = package.DisplayName,
-                            ManifestPath = manifestPath
+                            ManifestPath = manifestPath,
+                            IconSource = await LoadAppIconAsync(logoPath)
                         });
                     }
                 }
@@ -116,13 +120,73 @@ namespace WSAppBak
             return installedApps.OrderBy(app => app.Name).ToList();
         }
 
-
-        private void InstalledAppsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async Task<string> GetAppLogoPathAsync(Package package)
         {
-            if (InstalledAppsComboBox.SelectedItem is InstalledApp selectedApp)
+            try
+            {
+                var installedLocation = package.InstalledLocation;
+                var manifestFile = await installedLocation.GetFileAsync("AppxManifest.xml");
+                var manifestContent = await FileIO.ReadTextAsync(manifestFile);
+
+                XmlDocument manifestXml = new XmlDocument();
+                manifestXml.LoadXml(manifestContent);
+
+                XmlNamespaceManager nsmgr = new XmlNamespaceManager(new NameTable());
+                nsmgr.AddNamespace("x", "http://schemas.microsoft.com/appx/manifest/foundation/windows10");
+
+                XmlNode logoNode = manifestXml.SelectSingleNode("//x:Properties/x:Logo", nsmgr);
+                if (logoNode != null)
+                {
+                    var logoPath = logoNode.InnerText;
+                    var logoUri = new Uri(installedLocation.Path + "\\" + logoPath);
+                    return logoUri.AbsoluteUri;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions as needed
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+
+            return null;
+        }
+
+        private async Task<BitmapImage> LoadAppIconAsync(string logoPath)
+        {
+            if (string.IsNullOrEmpty(logoPath)) return null;
+
+            try
+            {
+                var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(logoPath);
+                using (IRandomAccessStream stream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read))
+                {
+                    BitmapImage bitmapImage = new BitmapImage();
+                    await bitmapImage.SetSourceAsync(stream);
+                    return bitmapImage;
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private void AppSearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                var suggestions = AllInstalledApps
+                    .Where(app => app.Name.Contains(sender.Text, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+                sender.ItemsSource = suggestions;
+            }
+        }
+
+        private void AppSearchBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            if (args.SelectedItem is InstalledApp selectedApp)
             {
                 SelectedAppPath = selectedApp.ManifestPath.Substring(0, selectedApp.ManifestPath.LastIndexOf('\\'));
-                SelectedPathTextBlock.Text = $"Selected App Path: {SelectedAppPath}";
             }
         }
 
@@ -333,6 +397,7 @@ namespace WSAppBak
     {
         public string Name { get; set; }
         public string ManifestPath { get; set; }
+        public BitmapImage IconSource { get; set; }
 
         public override string ToString()
         {

@@ -28,9 +28,8 @@
 
         <!-- App Title Bar -->
         <Border x:Name="AppTitleBar" 
-                Background="Transparent" 
-                Grid.ColumnSpan="2" 
-                Height="32" 
+                Background="Transparent"
+                Height="28" 
                 VerticalAlignment="Top">
             <TextBlock x:Name="AppTitle" 
                        VerticalAlignment="Center" 
@@ -53,31 +52,36 @@
                    Style="{StaticResource BodyTextBlockStyle}"
                    VerticalAlignment="Center" 
                    Margin="0,0,20,0"/>
-        <ComboBox x:Name="InstalledAppsComboBox" 
-                  Grid.Row="2" 
-                  Grid.Column="1"
-                  MinWidth="300"
-                  MaxWidth="500"
-                  HorizontalAlignment="Stretch"
-                  SelectionChanged="InstalledAppsComboBox_SelectionChanged"/>
-
-        <!-- Selected Path Display -->
-        <TextBlock x:Name="SelectedPathTextBlock" 
-                   Grid.Row="3"
-                   Grid.ColumnSpan="2" 
-                   Margin="0,10,0,20"
-                   Style="{StaticResource CaptionTextBlockStyle}"
-                   TextWrapping="Wrap"/>
+        <AutoSuggestBox x:Name="AppSearchBox"
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        PlaceholderText="Search for an app..."
+                        QueryIcon="Find"
+                        TextChanged="AppSearchBox_TextChanged"
+                        SuggestionChosen="AppSearchBox_SuggestionChosen"
+                        MinWidth="300"
+                        MaxWidth="500"
+                        HorizontalAlignment="Stretch">
+            <AutoSuggestBox.ItemTemplate>
+                <DataTemplate x:DataType="local:InstalledApp">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="{x:Bind IconSource}" Width="20" Height="20" Margin="0,0,10,0"/>
+                        <TextBlock Text="{x:Bind Name}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </DataTemplate>
+            </AutoSuggestBox.ItemTemplate>
+        </AutoSuggestBox>
 
         <!-- Output Path -->
-        <TextBlock Grid.Row="4" 
+        <TextBlock Grid.Row="3" 
                    Text="Output Path:" 
                    Style="{StaticResource BodyTextBlockStyle}"
                    VerticalAlignment="Center" 
-                   Margin="0,0,20,0"/>
+                   Margin="0,50,20,0"/>
         <TextBox x:Name="OutputPath" 
-                 Grid.Row="4"
+                 Grid.Row="3"
                  Grid.Column="1"
+                 Margin="0,50,0,0"
                  MinWidth="300"
                  MaxWidth="500"
                  HorizontalAlignment="Stretch"
@@ -89,24 +93,21 @@
                     Orientation="Horizontal" 
                     HorizontalAlignment="Right" 
                     Margin="0,20,0,0">
-            
             <Button x:Name="StartButton" 
                     Content="Start"
                     Click="StartButton_Click" 
                     Margin="0,0,10,0"/>
-            
             <Button x:Name="HelpButton"  
                     Content="?" 
                     Width="32" 
                     Height="32"
                     CornerRadius="16" 
                     Click="HelpButton_Click" />
-            
         </StackPanel>
 
         <!-- Info Text -->
         <TextBlock x:Name="InfoText" 
-                   Grid.Row="6" 
+                   Grid.Row="5" 
                    Grid.ColumnSpan="2" 
                    Margin="0,20,0,0" 
                    HorizontalAlignment="Center" 
