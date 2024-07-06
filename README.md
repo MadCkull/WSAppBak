@@ -1,6 +1,5 @@
 # 📱 WSAPPBak: Windows App Backup Solution
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![WinUI 3](https://img.shields.io/badge/WinUI-3-blue)](https://docs.microsoft.com/en-us/windows/apps/winui/winui3/)
 [![C#](https://img.shields.io/badge/C%23-Latest-green.svg)](https://docs.microsoft.com/en-us/dotnet/csharp/)
 
