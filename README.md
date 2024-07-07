@@ -19,17 +19,20 @@ WSAPPBak is a powerful and user-friendly WinUI 3 Windows application designed to
 
 ### Prerequisites
 
-- Windows 10 (Windows 11 Recommended)
+- Windows 10 (Recommended: Windows 11)
 - .NET 5.0 Runtime or later
 - At least 200MB of free disk space
 
 ### Installation
 
-1. Download the latest release from [GitHub Releases](https://github.com/MadCkull/WSAppBak/releases) page. **(Not Working yet)**
-   #### Try This:
-1. Clone Repo or Download Zip
+1. Download the latest release from [GitHub Releases](https://github.com/MadCkull/WSAppBak/releases) page.
+2. Install Dependencies and Application
+3. Done.
+### or
+1. Clone Repo
 2. Open solution in Visual Studio
-3. Run.
+3. Build & Run.
+
 
 ## 📘 Usage Guide
 
