@@ -1,11 +1,11 @@
-# 📱 WSAPPBak: Windows App Backup Solution
+# 📱 WSAppBak: Windows App Cracker
 
 [![WinUI 3](https://img.shields.io/badge/WinUI-3-blue)](https://docs.microsoft.com/en-us/windows/apps/winui/winui3/)
 [![C#](https://img.shields.io/badge/C%23-Latest-green.svg)](https://docs.microsoft.com/en-us/dotnet/csharp/)
 
 WSAPPBak is a powerful and user-friendly WinUI 3 Windows application designed to Crack paid Windows Application. And Backup Application along with Certificates.
 
-![WSAPPBak Demo](https://via.placeholder.com/600x300.png?text=WSAPPBak+Demo+GIF)
+![WSAPPBak Demo](WSAppBak/WSAppBak/Assets/WSAppBak_Preview.png)
 
 ## 🚀 Key Features
 
@@ -25,8 +25,11 @@ WSAPPBak is a powerful and user-friendly WinUI 3 Windows application designed to
 
 ### Installation
 
-1. Download the latest release from [GitHub Releases](https://github.com/MadCkull/WSAppBak/releases) page.
-2. Install the Application File.
+1. Download the latest release from [GitHub Releases](https://github.com/MadCkull/WSAppBak/releases) page. **(Not Working yet)**
+   #### Try This:
+1. Clone Repo or Download Zip
+2. Open solution in Visual Studio
+3. Run.
 
 ## 📘 Usage Guide
 
