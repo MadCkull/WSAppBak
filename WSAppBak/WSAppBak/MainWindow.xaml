@@ -19,6 +19,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -83,21 +84,22 @@
                  Grid.Row="3"
                  Grid.Column="1"
                  Margin="0,50,0,0"
+                 TextChanged="OutputPath_TextChanged"
                  MinWidth="300"
                  MaxWidth="500"
-                 HorizontalAlignment="Stretch"
-                 PlaceholderText="Default: C:\Users\MadCkull\Documents\WSAppBak Output"/>
+                 HorizontalAlignment="Stretch" />
 
         <!-- Buttons -->
         <StackPanel Grid.Row="5" 
                     Grid.Column="1" 
                     Orientation="Horizontal" 
                     HorizontalAlignment="Right" 
-                    Margin="0,20,0,0">
+                    Margin="0,30,31,0">
             <Button x:Name="StartButton" 
                     Content="Start"
                     Click="StartButton_Click" 
-                    Margin="0,0,10,0"/>
+                    Margin="0,0,10,0"
+                    Width="85"/>
             <Button x:Name="HelpButton"  
                     Content="?" 
                     Width="32" 
@@ -108,10 +110,14 @@
 
         <!-- Info Text -->
         <TextBlock x:Name="InfoText" 
-                   Grid.Row="5" 
+                   Grid.Row="6" 
                    Grid.ColumnSpan="2" 
-                   Margin="0,20,0,0" 
-                   HorizontalAlignment="Center" 
+                   FontSize="10.5"
+                   FontFamily="Consolas"
+                   Foreground="DarkGray"
+                   Margin="-10,0,0,-17" 
+                   HorizontalAlignment="Left" 
+                   VerticalAlignment="Bottom"
                    Style="{StaticResource BodyTextBlockStyle}"/>
     </Grid>
 </Window>

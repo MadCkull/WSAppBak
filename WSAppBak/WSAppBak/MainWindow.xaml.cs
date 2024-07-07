@@ -17,6 +17,7 @@ using System.Linq;
 using Windows.ApplicationModel;
 using Windows.Storage.Streams;
 using Microsoft.UI.Xaml.Media.Imaging;
+using System.Text.RegularExpressions;
 
 
 namespace WSAppBak
@@ -54,8 +55,9 @@ namespace WSAppBak
             InfoText.Text = String.Empty;
 
             ControlsStatus(true);
+            StartButton.IsEnabled = false;
 
-            OutputPath.Text = "D:\\Other\\WSAPPOutput";
+            OutputPath.Text = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", "WSAppBak");
         }
 
         private void SetWindowSize(int width, int height, bool resizable)
@@ -70,7 +72,7 @@ namespace WSAppBak
             {
                 overlappedPresenter.IsResizable = resizable;
                 overlappedPresenter.IsMaximizable = resizable;
-                overlappedPresenter.IsAlwaysOnTop = !resizable;
+                //overlappedPresenter.IsAlwaysOnTop = !resizable;
             }
         }
 
@@ -269,6 +271,26 @@ namespace WSAppBak
                     .ToList();
                 sender.ItemsSource = suggestions;
             }
+            if (OutputPath.Text == string.Empty || AppSearchBox.Text == string.Empty)
+            {
+                StartButton.IsEnabled = false;
+            }
+            else
+            {
+                StartButton.IsEnabled = true;
+            }
+        }
+
+        private void OutputPath_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (OutputPath.Text == string.Empty || AppSearchBox.Text == string.Empty)
+            {
+                StartButton.IsEnabled = false;
+            }
+            else
+            {
+                StartButton.IsEnabled = true;
+            }
         }
 
         private void AppSearchBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
@@ -278,6 +300,14 @@ namespace WSAppBak
                 _selectedApp = selectedApp;
                 SelectedAppPath = selectedApp.ManifestPath.Substring(0, selectedApp.ManifestPath.LastIndexOf('\\'));
                 sender.Text = selectedApp.Name;
+            }
+            if (OutputPath.Text == string.Empty || AppSearchBox.Text == string.Empty)
+            {
+                StartButton.IsEnabled = false;
+            }
+            else
+            {
+                StartButton.IsEnabled = true;
             }
         }
 
@@ -300,8 +330,19 @@ namespace WSAppBak
         {
             InfoText.Text = string.Empty;
             ControlsStatus(false);
-            await RunAsync();
-            ControlsStatus(true);
+            try
+            {
+                await RunAsync();
+                await RenameOutputFilesAsync();
+            }
+            catch (Exception ex)
+            {
+                InfoText.Text = $"An error occurred: {ex.Message}";
+            }
+            finally
+            {
+                ControlsStatus(true);
+            }
         }
 
         private void HelpButton_Click(object sender, RoutedEventArgs e)
@@ -330,20 +371,28 @@ namespace WSAppBak
         private async Task ReadArgAsync()
         {
             InfoText.Text = "Reading Arguments.";
-
             var wsAppPath = SelectedAppPath;
-            var wsAppOutputPath = OutputPath.Text.Trim('"');
+
+            var appName = _selectedApp.Name;
+            // Clean the app name
+            appName = Regex.Replace(appName, @"[^\w\s]", " "); // Remove special characters
+            appName = Regex.Replace(appName, @"\s+", " ").Trim(); // Remove extra spaces
+
+            var wsAppOutputPath = $"{OutputPath.Text.Trim('"')}\\{appName}";
+            InfoText.Text = wsAppOutputPath;
+
 
             if (!File.Exists(Path.Combine(wsAppPath, WSAppXmlFile)))
             {
                 throw new FileNotFoundException($"Invalid App Path. {WSAppXmlFile} file not found!");
             }
 
-            if (!Directory.Exists(wsAppOutputPath))
+            if (Directory.Exists(wsAppOutputPath))
             {
-                throw new DirectoryNotFoundException($"Invalid Output Path. {wsAppOutputPath} directory not found!");
+                Directory.Delete(wsAppOutputPath, true);
             }
 
+            Directory.CreateDirectory(wsAppOutputPath);
             _wsAppInfo = new WSAppInfo
             {
                 Path = wsAppPath,
@@ -492,7 +541,75 @@ namespace WSAppBak
 
             return output;
         }
+
+
+
+
+
+
+
+
+
+
+        //Renaming Methods:
+
+
+        private async Task RenameOutputFilesAsync()
+        {
+            try
+            {
+                var outputDir = new DirectoryInfo(_wsAppInfo.OutputPath);
+                var files = outputDir.GetFiles();
+
+                // Rename .appx file
+                var appxFile = files.FirstOrDefault(f => f.Extension.Equals(".appx", StringComparison.OrdinalIgnoreCase));
+                if (appxFile != null)
+                {
+                    string newAppxName = GetAppxFileName(_wsAppInfo.Name, _wsAppInfo.Version);
+                    File.Move(appxFile.FullName, Path.Combine(outputDir.FullName, newAppxName));
+                }
+
+                // Rename certificate files
+                RenameFile(files, ".pvk", "Sign Key");
+                RenameFile(files, ".cer", "Certificate");
+                RenameFile(files, ".pfx", "Certificate");
+            }
+            catch (Exception ex)
+            {
+                InfoText.Text = $"Error renaming files: {ex.Message}";
+            }
+        }
+
+        private string GetAppxFileName(string appName, string version)
+        {
+            // Clean the app name
+            appName = Regex.Replace(appName, @"[^\w\s]", " "); // Remove special characters
+            appName = Regex.Replace(appName, @"\s+", " ").Trim(); // Remove extra spaces
+
+            // Process the version
+            var versionParts = version.Split('.');
+            var majorVersion = versionParts[0];
+            var minorVersion = versionParts.Length > 1 ? "." + versionParts[1] : "";
+
+            return $"{appName} v{majorVersion}{minorVersion}.appx";
+        }
+
+        private void RenameFile(FileInfo[] files, string extension, string baseName)
+        {
+            var matchingFiles = files.Where(f => f.Extension.Equals(extension, StringComparison.OrdinalIgnoreCase)).ToList();
+            for (int i = 0; i < matchingFiles.Count; i++)
+            {
+                string newName = i == 0
+                    ? $"{baseName}{extension}"
+                    : $"{baseName} {i + 1}{extension}";
+                File.Move(matchingFiles[i].FullName, Path.Combine(matchingFiles[i].DirectoryName, newName));
+            }
+        }
+
     }
+
+
+
 
 
     public class InstalledApp

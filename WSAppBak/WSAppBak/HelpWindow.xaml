@@ -16,7 +16,7 @@
     <Grid>
         <ScrollViewer>
             <RichTextBlock xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-                <Paragraph Margin="350,0,0,0" >
+                <Paragraph Margin="170,0,0,0">
                     <Run FontWeight="Bold" FontSize="24" Foreground="AntiqueWhite" >Instructions</Run>
                 </Paragraph>
 
@@ -41,41 +41,37 @@
                 </Paragraph>
 
                 <Paragraph FontSize="16" Margin="16,20,10,0">
-                    <Run FontWeight="Bold" Foreground="Wheat">► Crack and Install Application:</Run>
+                    <Run FontWeight="Bold" Foreground="Wheat">► Crack Application:</Run>
                 </Paragraph>
                 <Paragraph Margin="40,0,0,0">
-                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Copy the AppFolder Path, usually in "C:\Program Files\WindowsApps\'AppFolder'" (Note: Select AppFolder with the largest size)
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Run "WSAppBak" as Admin (Recommended)
                 </Paragraph>
                 <Paragraph Margin="40,0,0,0">
-                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Run "WSAppBak.exe" as Admin
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Select App From Dropdown Menu
                 </Paragraph>
                 <Paragraph Margin="40,0,0,0">
-                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Paste the Copied Path
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Enter the Output path and Click Start
                 </Paragraph>
                 <Paragraph Margin="40,0,0,0">
-                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Enter the Output path and Hit Enter
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> A Window will pop up 'Create Private Key Password', Select None.
                 </Paragraph>
                 <Paragraph Margin="40,0,0,0">
-                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> A Window will pop up 'Create Private Key Password', Select None (Recommended)
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Wait for process to complete.
+                </Paragraph>
+                <Paragraph FontSize="16" Margin="16,20,10,0">
+                    <Run FontWeight="Bold" Foreground="Wheat">► Uninstall Old Application:</Run>
                 </Paragraph>
                 <Paragraph Margin="40,0,0,0">
-                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Uninstall Previously Installed Application
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Uninstall Previously Installed Application.
                 </Paragraph>
-                <Paragraph Margin="40,0,0,0">
-                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Install Dependencies depending on your Architecture (if required)
+                <Paragraph FontSize="16" Margin="16,20,10,0">
+                    <Run FontWeight="Bold" Foreground="Wheat">► Install App Certificates:</Run>
                 </Paragraph>
                 <Paragraph Margin="40,0,0,0">
                     <Run FontWeight="Bold" Foreground="Gray">‣</Run> Install Certificates (in Output Folder)
                 </Paragraph>
-                <Paragraph Margin="40,0,0,0">
-                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Copy 'WSAppPkgIns.exe' file to 'C:\Windows\System32'
-                </Paragraph>
-                <Paragraph Margin="40,0,0,0">
-                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Install the App (.appx) using 'WSAppPkgIns.exe' that was copied in the previous step (Use: Open With > )
-                </Paragraph>
-
                 <Paragraph FontSize="16" Margin="16,20,10,0">
-                    <Run FontWeight="Bold" Foreground="Wheat">● If you encounter any Error at Step 10, You should try this Method:</Run>
+                    <Run FontWeight="Bold" Foreground="Wheat">► Install Application:</Run>
                 </Paragraph>
                 <Paragraph Margin="40,0,0,0">
                     <Run FontWeight="Bold" Foreground="Gray">‣</Run> Open Properties of .appx file
@@ -105,10 +101,10 @@
                     <Run FontWeight="Bold" Foreground="Gray">‣</Run> Repeat Installation Steps if there are Multiple Certificates in the List
                 </Paragraph>
                 <Paragraph Margin="40,0,0,0">
-                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Now, Simply just Install Application
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Install Dependencies depending on your Architecture (if required)
                 </Paragraph>
                 <Paragraph Margin="40,0,0,0">
-                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> You can also Skip Step 08
+                    <Run FontWeight="Bold" Foreground="Gray">‣</Run> Now, Simply just Install Application (.appx File)
                 </Paragraph>
                 <Paragraph Margin="40,0,30,0"> </Paragraph>
             </RichTextBlock>

@@ -28,7 +28,7 @@ namespace WSAppBak
         {
             this.InitializeComponent();
 
-            WindowSize(1300, 600, false);
+            WindowSize(1300, 1000, false);
         }
 
 
