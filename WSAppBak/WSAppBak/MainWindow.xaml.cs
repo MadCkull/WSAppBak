@@ -19,11 +19,12 @@ using Windows.Storage.Streams;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System.Text.RegularExpressions;
 
-
 namespace WSAppBak
 {
     public sealed partial class MainWindow : Window
     {
+        #region Constants and Fields
+
         private const string AppName = "Windows Store App Backup";
         private const string AppCreator = "MadCkull";
         private const string WSAppXmlFile = "AppxManifest.xml";
@@ -31,75 +32,12 @@ namespace WSAppBak
         private readonly string _appCurrentDir = AppContext.BaseDirectory;
 
         private InstalledApp _selectedApp;
-        private string SelectedAppPath;
-        private List<InstalledApp> AllInstalledApps;
-
+        private string _selectedAppPath;
+        private List<InstalledApp> _allInstalledApps;
 
         private WSAppInfo _wsAppInfo;
 
-        public MainWindow()
-        {
-            InitializeComponent();
-            InfoText.Text = "Please Wait while we load Apps...";
-            ControlsStatus(false);
-            InitializeWindowAsync();
-            LogCurrentDirectory();
-        }
-
-        private async void InitializeWindowAsync()
-        {
-            SetWindowSize(1800, 950, false);
-            ExtendsContentIntoTitleBar = true;
-            //SetTitleBar(AppTitleBar);
-            await LoadInstalledAppsAsync();
-            InfoText.Text = String.Empty;
-
-            ControlsStatus(true);
-            StartButton.IsEnabled = false;
-
-            OutputPath.Text = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", "WSAppBak");
-        }
-
-        private void SetWindowSize(int width, int height, bool resizable)
-        {
-            var hWnd = WindowNative.GetWindowHandle(this);
-            var windowId = Win32Interop.GetWindowIdFromWindow(hWnd);
-            var appWindow = AppWindow.GetFromWindowId(windowId);
-
-            appWindow.Resize(new Windows.Graphics.SizeInt32 { Width = width, Height = height });
-
-            if (appWindow.Presenter is OverlappedPresenter overlappedPresenter)
-            {
-                overlappedPresenter.IsResizable = resizable;
-                overlappedPresenter.IsMaximizable = resizable;
-                //overlappedPresenter.IsAlwaysOnTop = !resizable;
-            }
-        }
-
-
-        private void ControlsStatus(bool Status)
-        {
-            AppSearchBox.IsEnabled = Status;
-            OutputPath.IsEnabled = Status;
-            StartButton.IsEnabled = Status;
-        }
-        private void LogCurrentDirectory()
-        {
-            //[Write Log Code Here]
-
-            //File.AppendAllText(_logFilePath, $"DirectoryPath: {currentDir}\nFull Name: {rootPath}\nParent: {parentPath}\n");
-        }
-
-
-        //Fetching App Installed List
-
-
-        private async Task LoadInstalledAppsAsync()
-        {
-            AllInstalledApps = await GetInstalledAppsAsync();
-            AppSearchBox.ItemsSource = AllInstalledApps;
-        }
-
+        // Moved HashSet to class level for better performance
         private static readonly HashSet<string> SystemAppPrefixes = new HashSet<string>
         {
             "1527c705-839a-4832-9118-54d4Bd6a0c89",
@@ -133,6 +71,86 @@ namespace WSAppBak
             "Microsoft.XboxIdentityProvider",
             "Microsoft.YourPhone",
         };
+
+        #endregion
+
+        #region Constructor and Initialization
+
+        public MainWindow()
+        {
+            InitializeComponent();
+            InfoText.Text = "Please Wait while we load Apps...";
+            ControlsStatus(false);
+            InitializeWindowAsync();
+            _ = LogCurrentDirectoryAsync(); // Fire and forget, but consider proper error handling
+        }
+
+        private async void InitializeWindowAsync()
+        {
+            SetWindowSize(1800, 950, false);
+            ExtendsContentIntoTitleBar = true;
+            await LoadInstalledAppsAsync();
+            InfoText.Text = string.Empty;
+
+            ControlsStatus(true);
+            StartButton.IsEnabled = false;
+
+            OutputPath.Text = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", "WSAppBak");
+        }
+
+        private void SetWindowSize(int width, int height, bool resizable)
+        {
+            var hWnd = WindowNative.GetWindowHandle(this);
+            var windowId = Win32Interop.GetWindowIdFromWindow(hWnd);
+            var appWindow = AppWindow.GetFromWindowId(windowId);
+
+            appWindow.Resize(new Windows.Graphics.SizeInt32 { Width = width, Height = height });
+
+            if (appWindow.Presenter is OverlappedPresenter overlappedPresenter)
+            {
+                overlappedPresenter.IsResizable = resizable;
+                overlappedPresenter.IsMaximizable = resizable;
+            }
+        }
+
+        private void ControlsStatus(bool status)
+        {
+            AppSearchBox.IsEnabled = status;
+            OutputPath.IsEnabled = status;
+            StartButton.IsEnabled = status;
+        }
+
+        private async Task LogCurrentDirectoryAsync()
+        {
+            try
+            {
+                string currentDir = AppContext.BaseDirectory;
+                string logMessage = $"Current Directory: {currentDir}\n" +
+                                    $"Timestamp: {DateTime.Now}\n" +
+                                    $"---------------------------\n";
+
+                // Assuming you want to log to a file in the app's directory
+                string logFilePath = Path.Combine(currentDir, "app_log.txt");
+
+                // Use asynchronous file write operation
+                await File.AppendAllTextAsync(logFilePath, logMessage);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error logging current directory: {ex.Message}");
+                // Consider implementing a more robust error handling mechanism
+            }
+        }
+
+        #endregion
+
+        #region App Loading and Filtering
+
+        private async Task LoadInstalledAppsAsync()
+        {
+            _allInstalledApps = await GetInstalledAppsAsync();
+            AppSearchBox.ItemsSource = _allInstalledApps;
+        }
 
         private async Task<List<InstalledApp>> GetInstalledAppsAsync()
         {
@@ -173,42 +191,14 @@ namespace WSAppBak
 
         private bool IsSystemOrDependencyApp(Package package)
         {
-            // Filter out system apps
-            if (package.SignatureKind == PackageSignatureKind.System)
-            {
-                return true;
-            }
-
-            // Filter out apps with empty or generic names
-            if (string.IsNullOrWhiteSpace(package.DisplayName) || package.DisplayName == "App" || package.DisplayName == "Application")
-            {
-                return true;
-            }
-
-            // Filter out known system app prefixes
-            foreach (var prefix in SystemAppPrefixes)
-            {
-                if (package.Id.FullName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
-
-            // Filter out framework packages
-            if (package.IsFramework)
-            {
-                return true;
-            }
-
-            // Filter out resource packages
-            if (package.IsResourcePackage)
-            {
-                return true;
-            }
-
-            // Additional filters can be added here as needed
-
-            return false;
+            // Filter out system apps, empty or generic names, known system app prefixes, framework packages, and resource packages
+            return package.SignatureKind == PackageSignatureKind.System
+                || string.IsNullOrWhiteSpace(package.DisplayName)
+                || package.DisplayName == "App"
+                || package.DisplayName == "Application"
+                || SystemAppPrefixes.Any(prefix => package.Id.FullName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                || package.IsFramework
+                || package.IsResourcePackage;
         }
 
         private async Task<string> GetAppLogoPathAsync(Package package)
@@ -235,8 +225,7 @@ namespace WSAppBak
             }
             catch (Exception ex)
             {
-                // Handle exceptions as needed
-                System.Diagnostics.Debug.WriteLine(ex.Message);
+                Debug.WriteLine($"Error getting app logo path: {ex.Message}");
             }
 
             return null;
@@ -248,8 +237,8 @@ namespace WSAppBak
 
             try
             {
-                var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(logoPath);
-                using (IRandomAccessStream stream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read))
+                var file = await StorageFile.GetFileFromPathAsync(logoPath);
+                using (IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.Read))
                 {
                     BitmapImage bitmapImage = new BitmapImage();
                     await bitmapImage.SetSourceAsync(stream);
@@ -262,35 +251,25 @@ namespace WSAppBak
             }
         }
 
+        #endregion
+
+        #region UI Event Handlers
+
         private void AppSearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
-                var suggestions = AllInstalledApps
+                var suggestions = _allInstalledApps
                     .Where(app => app.Name.Contains(sender.Text, StringComparison.OrdinalIgnoreCase))
                     .ToList();
                 sender.ItemsSource = suggestions;
             }
-            if (OutputPath.Text == string.Empty || AppSearchBox.Text == string.Empty)
-            {
-                StartButton.IsEnabled = false;
-            }
-            else
-            {
-                StartButton.IsEnabled = true;
-            }
+            UpdateStartButtonStatus();
         }
 
         private void OutputPath_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (OutputPath.Text == string.Empty || AppSearchBox.Text == string.Empty)
-            {
-                StartButton.IsEnabled = false;
-            }
-            else
-            {
-                StartButton.IsEnabled = true;
-            }
+            UpdateStartButtonStatus();
         }
 
         private void AppSearchBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
@@ -298,33 +277,16 @@ namespace WSAppBak
             if (args.SelectedItem is InstalledApp selectedApp)
             {
                 _selectedApp = selectedApp;
-                SelectedAppPath = selectedApp.ManifestPath.Substring(0, selectedApp.ManifestPath.LastIndexOf('\\'));
+                _selectedAppPath = selectedApp.ManifestPath.Substring(0, selectedApp.ManifestPath.LastIndexOf('\\'));
                 sender.Text = selectedApp.Name;
             }
-            if (OutputPath.Text == string.Empty || AppSearchBox.Text == string.Empty)
-            {
-                StartButton.IsEnabled = false;
-            }
-            else
-            {
-                StartButton.IsEnabled = true;
-            }
+            UpdateStartButtonStatus();
         }
 
         private void AppSearchBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (_selectedApp != null)
-            {
-                AppSearchBox.Text = _selectedApp.Name;
-            }
-            else
-            {
-                AppSearchBox.Text = string.Empty;
-            }
+            AppSearchBox.Text = _selectedApp?.Name ?? string.Empty;
         }
-
-
-
 
         private async void StartButton_Click(object sender, RoutedEventArgs e)
         {
@@ -351,6 +313,15 @@ namespace WSAppBak
             window.Activate();
         }
 
+        private void UpdateStartButtonStatus()
+        {
+            StartButton.IsEnabled = !string.IsNullOrEmpty(OutputPath.Text) && !string.IsNullOrEmpty(AppSearchBox.Text);
+        }
+
+        #endregion
+
+        #region App Backup Process
+
         private async Task RunAsync()
         {
             try
@@ -371,16 +342,11 @@ namespace WSAppBak
         private async Task ReadArgAsync()
         {
             InfoText.Text = "Reading Arguments.";
-            var wsAppPath = SelectedAppPath;
+            var wsAppPath = _selectedAppPath;
 
-            var appName = _selectedApp.Name;
-            // Clean the app name
-            appName = Regex.Replace(appName, @"[^\w\s]", " "); // Remove special characters
-            appName = Regex.Replace(appName, @"\s+", " ").Trim(); // Remove extra spaces
-
-            var wsAppOutputPath = $"{OutputPath.Text.Trim('"')}\\{appName}";
+            var appName = CleanAppName(_selectedApp.Name);
+            var wsAppOutputPath = Path.Combine(OutputPath.Text.Trim('"'), appName);
             InfoText.Text = wsAppOutputPath;
-
 
             if (!File.Exists(Path.Combine(wsAppPath, WSAppXmlFile)))
             {
@@ -474,7 +440,6 @@ namespace WSAppBak
                 throw new Exception("Failed to create Certificates!");
             }
         }
-
         private async Task ConvertCertificateAsync()
         {
             var pvk2PfxPath = Path.Combine(_appCurrentDir, "WSTools", "Pvk2Pfx.exe");
@@ -492,7 +457,7 @@ namespace WSAppBak
             var args = $"-pvk \"{pvkPath}\" -spc \"{cerPath}\" -pfx \"{pfxPath}\"";
             var result = await RunProcessAsync(pvk2PfxPath, args);
 
-            if (result.Length != 0)
+            if (!string.IsNullOrWhiteSpace(result))
             {
                 throw new Exception("Failed to convert certificates!");
             }
@@ -542,17 +507,9 @@ namespace WSAppBak
             return output;
         }
 
+        #endregion
 
-
-
-
-
-
-
-
-
-        //Renaming Methods:
-
+        #region File Renaming
 
         private async Task RenameOutputFilesAsync()
         {
@@ -582,9 +539,7 @@ namespace WSAppBak
 
         private string GetAppxFileName(string appName, string version)
         {
-            // Clean the app name
-            appName = Regex.Replace(appName, @"[^\w\s]", " "); // Remove special characters
-            appName = Regex.Replace(appName, @"\s+", " ").Trim(); // Remove extra spaces
+            appName = CleanAppName(appName);
 
             // Process the version
             var versionParts = version.Split('.');
@@ -606,11 +561,16 @@ namespace WSAppBak
             }
         }
 
+        private string CleanAppName(string appName)
+        {
+            // Remove special characters and extra spaces
+            appName = Regex.Replace(appName, @"[^\w\s]", " ");
+            appName = Regex.Replace(appName, @"\s+", " ").Trim();
+            return appName;
+        }
+
+        #endregion
     }
-
-
-
-
 
     public class InstalledApp
     {
