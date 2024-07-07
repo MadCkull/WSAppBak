@@ -10,7 +10,7 @@
   <Identity
     Name="04412c20-ed95-4300-a57c-9d2908e3aab6"
     Publisher="CN=MadCkull"
-    Version="1.0.11.0" />
+    Version="1.0.14.0" />
 
   <mp:PhoneIdentity PhoneProductId="04412c20-ed95-4300-a57c-9d2908e3aab6" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
