@@ -59,6 +59,7 @@
                         QueryIcon="Find"
                         TextChanged="AppSearchBox_TextChanged"
                         SuggestionChosen="AppSearchBox_SuggestionChosen"
+                        LostFocus="AppSearchBox_LostFocus"
                         MinWidth="300"
                         MaxWidth="500"
                         HorizontalAlignment="Stretch">

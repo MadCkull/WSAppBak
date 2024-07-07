@@ -13,10 +13,8 @@ using Microsoft.UI;
 using WinRT.Interop;
 using System.Collections.Generic;
 using Windows.Management.Deployment;
-
 using System.Linq;
 using Windows.ApplicationModel;
-
 using Windows.Storage.Streams;
 using Microsoft.UI.Xaml.Media.Imaging;
 
@@ -31,6 +29,7 @@ namespace WSAppBak
 
         private readonly string _appCurrentDir = AppContext.BaseDirectory;
 
+        private InstalledApp _selectedApp;
         private string SelectedAppPath;
         private List<InstalledApp> AllInstalledApps;
 
@@ -40,17 +39,21 @@ namespace WSAppBak
         public MainWindow()
         {
             InitializeComponent();
-            InitializeWindow();
+            InfoText.Text = "Please Wait while we load Apps...";
+            ControlsStatus(false);
+            InitializeWindowAsync();
             LogCurrentDirectory();
         }
 
-        private void InitializeWindow()
+        private async void InitializeWindowAsync()
         {
             SetWindowSize(1800, 950, false);
             ExtendsContentIntoTitleBar = true;
-            SetTitleBar(AppTitleBar);
+            //SetTitleBar(AppTitleBar);
+            await LoadInstalledAppsAsync();
+            InfoText.Text = String.Empty;
 
-            LoadInstalledAppsAsync();
+            ControlsStatus(true);
 
             OutputPath.Text = "D:\\Other\\WSAPPOutput";
         }
@@ -71,6 +74,13 @@ namespace WSAppBak
             }
         }
 
+
+        private void ControlsStatus(bool Status)
+        {
+            AppSearchBox.IsEnabled = Status;
+            OutputPath.IsEnabled = Status;
+            StartButton.IsEnabled = Status;
+        }
         private void LogCurrentDirectory()
         {
             //[Write Log Code Here]
@@ -88,6 +98,40 @@ namespace WSAppBak
             AppSearchBox.ItemsSource = AllInstalledApps;
         }
 
+        private static readonly HashSet<string> SystemAppPrefixes = new HashSet<string>
+        {
+            "1527c705-839a-4832-9118-54d4Bd6a0c89",
+            "c5e2524a-ea46-4f67-841f-6a9465d9d515",
+            "EightSecure.Firewall",
+            "E2A4F912-2574-4A75-9BB0-0D023378592B",
+            "F46D4000-FD22-4DB4-AC8E-4E1DDDE828FE",
+            "Microsoft.AAD.BrokerPlugin",
+            "Microsoft.AccountsControl",
+            "Microsoft.AsyncTextService",
+            "Microsoft.BioEnrollment",
+            "Microsoft.CredDialogHost",
+            "Microsoft.ECApp",
+            "Microsoft.LockApp",
+            "Microsoft.MicrosoftEdge",
+            "Microsoft.MicrosoftEdgeDevToolsClient",
+            "Microsoft.Win32WebViewHost",
+            "Microsoft.Windows.",
+            "windows.immersivecontrolpanel",
+            "Windows.ContactSupport",
+            "Windows.PrintDialog",
+            "Microsoft.Net",
+            "Microsoft.VCLibs",
+            "Microsoft.UI.Xaml",
+            "Microsoft.DirectX",
+            "Microsoft.WebpImageExtension",
+            "Microsoft.VP9VideoExtensions",
+            "Microsoft.ScreenSketch",
+            "Microsoft.Services.Store.Engagement",
+            "Microsoft.XboxGameCallableUI",
+            "Microsoft.XboxIdentityProvider",
+            "Microsoft.YourPhone",
+        };
+
         private async Task<List<InstalledApp>> GetInstalledAppsAsync()
         {
             var packageManager = new PackageManager();
@@ -99,6 +143,11 @@ namespace WSAppBak
             {
                 try
                 {
+                    if (IsSystemOrDependencyApp(package))
+                    {
+                        continue;
+                    }
+
                     var manifestPath = Path.Combine(package.InstalledLocation.Path, "AppxManifest.xml");
                     if (File.Exists(manifestPath))
                     {
@@ -118,6 +167,46 @@ namespace WSAppBak
             }
 
             return installedApps.OrderBy(app => app.Name).ToList();
+        }
+
+        private bool IsSystemOrDependencyApp(Package package)
+        {
+            // Filter out system apps
+            if (package.SignatureKind == PackageSignatureKind.System)
+            {
+                return true;
+            }
+
+            // Filter out apps with empty or generic names
+            if (string.IsNullOrWhiteSpace(package.DisplayName) || package.DisplayName == "App" || package.DisplayName == "Application")
+            {
+                return true;
+            }
+
+            // Filter out known system app prefixes
+            foreach (var prefix in SystemAppPrefixes)
+            {
+                if (package.Id.FullName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            // Filter out framework packages
+            if (package.IsFramework)
+            {
+                return true;
+            }
+
+            // Filter out resource packages
+            if (package.IsResourcePackage)
+            {
+                return true;
+            }
+
+            // Additional filters can be added here as needed
+
+            return false;
         }
 
         private async Task<string> GetAppLogoPathAsync(Package package)
@@ -186,12 +275,23 @@ namespace WSAppBak
         {
             if (args.SelectedItem is InstalledApp selectedApp)
             {
+                _selectedApp = selectedApp;
                 SelectedAppPath = selectedApp.ManifestPath.Substring(0, selectedApp.ManifestPath.LastIndexOf('\\'));
+                sender.Text = selectedApp.Name;
             }
         }
 
-
-
+        private void AppSearchBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (_selectedApp != null)
+            {
+                AppSearchBox.Text = _selectedApp.Name;
+            }
+            else
+            {
+                AppSearchBox.Text = string.Empty;
+            }
+        }
 
 
 
@@ -199,7 +299,9 @@ namespace WSAppBak
         private async void StartButton_Click(object sender, RoutedEventArgs e)
         {
             InfoText.Text = string.Empty;
+            ControlsStatus(false);
             await RunAsync();
+            ControlsStatus(true);
         }
 
         private void HelpButton_Click(object sender, RoutedEventArgs e)
