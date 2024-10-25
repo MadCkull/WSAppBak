@@ -53,7 +53,8 @@ WSAPPBak is a powerful and user-friendly WinUI 3 Windows application designed to
 Encountering issues? Try these steps:
 
 1. Ensure you're running the latest version of **WSAPPBak** and **Windows 11**.
-2. If the problem persists, please [open an issue](https://github.com/MadCkull/WSAppBak/issues) on our GitHub page.
+2. Having issues in installation? Check [Issues](https://github.com/MadCkull/WSAppBak/issues?q=is%3Aissue+is%3Aclosed) Section.
+3. If the problem persists, please [open an issue](https://github.com/MadCkull/WSAppBak/issues) on our GitHub page.
 
 ## 🤝 Contributing
 
@@ -74,6 +75,11 @@ We welcome contributions! Here's how you can help:
 - Thanks to an _unknown_ contributor who have helped shape WSAPPBak
 - Special thanks to the WinUI 3 team for their excellent framework
 - Icon assets provided by [Iconify](https://iconify.design/)
+
+
+## Note:
+
+It's not 100% accurate, don't expect it to work on every app..
 
 ---
 
