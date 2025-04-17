@@ -73,7 +73,7 @@ We welcome contributions! Here's how you can help:
 
 ## 👏 Acknowledgments
 
-- Thanks to an _unknown_ contributor who have helped shape WSAPPBak
+- Thanks to [Wapitiii](https://github.com/Wapitiii/WSAppBak.git) (Original Repo)
 - Special thanks to the WinUI 3 team for their excellent framework
 - Icon assets provided by [Iconify](https://iconify.design/)
 
