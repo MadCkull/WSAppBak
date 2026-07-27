@@ -43,14 +43,15 @@
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <EntryPointProjectUniqueName>..\WSAppBak\WSAppBak.csproj</EntryPointProjectUniqueName>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
-    <PackageCertificateThumbprint>007475AE1018DFA56EEFA67DC8BDF04C063BB86F</PackageCertificateThumbprint>
+    <PackageCertificatePassword>123456</PackageCertificatePassword>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
-    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxPackageDir>D:\Other\Projects\Published\WSAppBak\</AppxPackageDir>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
     <AppxBundlePlatforms>x64|arm64</AppxBundlePlatforms>
     <HoursBetweenUpdateChecks>720</HoursBetweenUpdateChecks>
     <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
+    <PackageCertificateThumbprint>5D9D4E2C0B16379840301D5C8ECF3950AB42882A</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <AppxBundle>Always</AppxBundle>
@@ -83,6 +84,16 @@
     <Content Include="Images\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <Content Include="Images\StoreLogo.png" />
     <Content Include="Images\Wide310x150Logo.scale-200.png" />
+    <Content Include="Square150x150Logo.scale-100.png" />
+    <Content Include="Square150x150Logo.scale-125.png" />
+    <Content Include="Square150x150Logo.scale-150.png" />
+    <Content Include="Square150x150Logo.scale-400.png" />
+    <Content Include="Square44x44Logo.scale-100.png" />
+    <Content Include="Square44x44Logo.scale-125.png" />
+    <Content Include="Square44x44Logo.scale-150.png" />
+    <Content Include="Square44x44Logo.scale-400.png" />
+    <Content Include="Square44x44Logo.targetsize-256.png" />
+    <Content Include="Square44x44Logo.targetsize-48.png" />
     <None Include="WSAppBak %28Package%29_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
@@ -92,10 +103,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240607001">
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250606001">
       <IncludeAssets>build</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1">
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4188">
       <IncludeAssets>build</IncludeAssets>
     </PackageReference>
   </ItemGroup>

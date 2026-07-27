@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:WSAppBak"
+    xmlns:models="using:WSAppBak.Models"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -13,20 +14,7 @@
     </Window.SystemBackdrop>
 
     <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-
+        
         <!-- App Title Bar -->
         <Border x:Name="AppTitleBar" 
                 Background="Transparent"
@@ -38,86 +26,120 @@
                        Style="{StaticResource CaptionTextBlockStyle}"/>
         </Border>
 
-        <!-- Main Title -->
-        <TextBlock Grid.Row="1" 
-                   Grid.ColumnSpan="2" 
-                   Text="WinStore App Backup" 
-                   Style="{StaticResource TitleTextBlockStyle}"
-                   FontSize="28" 
-                   Margin="0,20,0,30" 
-                   HorizontalAlignment="Center"/>
-
-        <!-- App Selection -->
-        <TextBlock Grid.Row="2" 
-                   Text="Select App:" 
-                   Style="{StaticResource BodyTextBlockStyle}"
-                   VerticalAlignment="Center" 
-                   Margin="0,0,20,0"/>
-        <AutoSuggestBox x:Name="AppSearchBox"
-                        Grid.Row="2"
-                        Grid.Column="1"
-                        PlaceholderText="Search for an app..."
-                        QueryIcon="Find"
-                        TextChanged="AppSearchBox_TextChanged"
-                        SuggestionChosen="AppSearchBox_SuggestionChosen"
-                        LostFocus="AppSearchBox_LostFocus"
-                        MinWidth="300"
-                        MaxWidth="500"
-                        HorizontalAlignment="Stretch">
-            <AutoSuggestBox.ItemTemplate>
-                <DataTemplate x:DataType="local:InstalledApp">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="{x:Bind IconSource}" Width="20" Height="20" Margin="0,0,10,0"/>
-                        <TextBlock Text="{x:Bind Name}" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </DataTemplate>
-            </AutoSuggestBox.ItemTemplate>
-        </AutoSuggestBox>
-
-        <!-- Output Path -->
-        <TextBlock Grid.Row="3" 
-                   Text="Output Path:" 
-                   Style="{StaticResource BodyTextBlockStyle}"
-                   VerticalAlignment="Center" 
-                   Margin="0,50,20,0"/>
-        <TextBox x:Name="OutputPath" 
-                 Grid.Row="3"
-                 Grid.Column="1"
-                 Margin="0,50,0,0"
-                 TextChanged="OutputPath_TextChanged"
-                 MinWidth="300"
-                 MaxWidth="500"
-                 HorizontalAlignment="Stretch" />
-
-        <!-- Buttons -->
-        <StackPanel Grid.Row="5" 
-                    Grid.Column="1" 
-                    Orientation="Horizontal" 
-                    HorizontalAlignment="Right" 
-                    Margin="0,30,31,0">
-            <Button x:Name="StartButton" 
-                    Content="Start"
-                    Click="StartButton_Click" 
-                    Margin="0,0,10,0"
-                    Width="85"/>
-            <Button x:Name="HelpButton"  
-                    Content="?" 
-                    Width="32" 
-                    Height="32"
-                    CornerRadius="16" 
-                    Click="HelpButton_Click" />
+        <!-- Splash Screen / Loading Indicator -->
+        <StackPanel x:Name="SplashPanel"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Visibility="{x:Bind BoolToVis(ViewModel.IsSplashVisible), Mode=OneWay}">
+             <ProgressRing IsActive="True" Width="50" Height="50"/>
+             <TextBlock Text="Loading Apps..." Margin="0,10,0,0" HorizontalAlignment="Center"/>
         </StackPanel>
 
-        <!-- Info Text -->
-        <TextBlock x:Name="InfoText" 
-                   Grid.Row="6" 
-                   Grid.ColumnSpan="2" 
-                   FontSize="10.5"
-                   FontFamily="Consolas"
-                   Foreground="DarkGray"
-                   Margin="-10,0,0,-17" 
-                   HorizontalAlignment="Left" 
-                   VerticalAlignment="Bottom"
-                   Style="{StaticResource BodyTextBlockStyle}"/>
+        <!-- Main Content -->
+        <Grid x:Name="MainGrid" Visibility="{x:Bind BoolToVis(ViewModel.IsContentVisible), Mode=OneWay}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            
+            <!-- Main Title -->
+            <TextBlock Grid.Row="1" 
+                       Grid.ColumnSpan="2" 
+                       Text="WinStore App Backup" 
+                       Style="{StaticResource TitleTextBlockStyle}"
+                       FontSize="28" 
+                       Margin="0,40,0,30" 
+                       HorizontalAlignment="Center"/>
+
+            <!-- App Selection -->
+            <TextBlock Grid.Row="2" 
+                       Text="Select App:" 
+                       Style="{StaticResource BodyTextBlockStyle}"
+                       VerticalAlignment="Center" 
+                       Margin="0,0,20,0"/>
+            <AutoSuggestBox x:Name="AppSearchBox"
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            PlaceholderText="Search for an app..."
+                            QueryIcon="Find"
+                            TextChanged="AppSearchBox_TextChanged"
+                            SuggestionChosen="AppSearchBox_SuggestionChosen"
+                            IsEnabled="{x:Bind ViewModel.IsControlsEnabled, Mode=OneWay}"
+                            MinWidth="300"
+                            MaxWidth="500"
+                            HorizontalAlignment="Stretch">
+                <AutoSuggestBox.ItemTemplate>
+                    <DataTemplate x:DataType="models:InstalledApp">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{x:Bind IconSource}" Width="20" Height="20" Margin="0,0,10,0"/>
+                            <TextBlock Text="{x:Bind Name}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </AutoSuggestBox.ItemTemplate>
+            </AutoSuggestBox>
+
+            <!-- Output Path -->
+            <TextBlock Grid.Row="3" 
+                       Text="Output Path:" 
+                       Style="{StaticResource BodyTextBlockStyle}"
+                       VerticalAlignment="Center" 
+                       Margin="0,50,20,0"/>
+            <Grid Grid.Row="3" Grid.Column="1" Margin="0,50,0,0" MinWidth="300" MaxWidth="500" HorizontalAlignment="Left">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="OutputPath" 
+                         Text="{x:Bind ViewModel.OutputPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         IsEnabled="{x:Bind ViewModel.IsControlsEnabled, Mode=OneWay}"
+                         HorizontalAlignment="Stretch" />
+                <Button Grid.Column="1" 
+                        Content="Browse..." 
+                        Command="{x:Bind ViewModel.BrowseCommand}" 
+                        IsEnabled="{x:Bind ViewModel.IsControlsEnabled, Mode=OneWay}"
+                        Margin="10,0,0,0" />
+            </Grid>
+
+            <!-- Buttons -->
+            <StackPanel Grid.Row="5" 
+                        Grid.Column="1" 
+                        Orientation="Horizontal" 
+                        HorizontalAlignment="Right" 
+                        Margin="0,30,31,0">
+                <Button x:Name="StartButton" 
+                        Content="Start"
+                        Command="{x:Bind ViewModel.StartCommand}"
+                        IsEnabled="{x:Bind ViewModel.IsControlsEnabled, Mode=OneWay}"
+                        Margin="0,0,10,0"
+                        Width="85"/>
+                <Button x:Name="HelpButton"  
+                        Content="?" 
+                        Width="32" 
+                        Height="32"
+                        CornerRadius="16" 
+                        Command="{x:Bind ViewModel.HelpCommand}" />
+            </StackPanel>
+
+            <!-- Info Text & Progress -->
+            <StackPanel Grid.Row="6" Grid.ColumnSpan="2" VerticalAlignment="Bottom" Margin="0,20,0,0" Spacing="10">
+                <ProgressBar IsIndeterminate="True" 
+                             Visibility="{x:Bind BoolToVis(ViewModel.IsBusy), Mode=OneWay}" 
+                             HorizontalAlignment="Stretch"/>
+                
+                <InfoBar IsOpen="{x:Bind ViewModel.InfoBarIsOpen, Mode=OneWay}"
+                         Severity="{x:Bind ViewModel.InfoBarSeverity, Mode=OneWay}"
+                         Message="{x:Bind ViewModel.InfoText, Mode=OneWay}"
+                         IsClosable="False" />
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

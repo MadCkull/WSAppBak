@@ -41,7 +41,7 @@
                 </Paragraph>
 
                 <Paragraph FontSize="16" Margin="16,20,10,0">
-                    <Run FontWeight="Bold" Foreground="Wheat">► Crack Application:</Run>
+                    <Run FontWeight="Bold" Foreground="Wheat">► Patch Application:</Run>
                 </Paragraph>
                 <Paragraph Margin="40,0,0,0">
                     <Run FontWeight="Bold" Foreground="Gray">‣</Run> Run "WSAppBak" as Admin (Recommended)

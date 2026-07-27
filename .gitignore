@@ -361,3 +361,10 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Exclude personal/audit folders
+RepoAudits/
+portfolio/
+
+# Force include Properties (needed for PublishProfiles)
+!WSAppBak/WSAppBak/Properties/

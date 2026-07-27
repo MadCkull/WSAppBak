@@ -1,9 +1,9 @@
-# 📱 WSAppBak: Windows App Cracker
+# 📱 WSAppBak: Windows App Backuper
 
 [![WinUI 3](https://img.shields.io/badge/WinUI-3-blue)](https://docs.microsoft.com/en-us/windows/apps/winui/winui3/)
 [![C#](https://img.shields.io/badge/C%23-Latest-green.svg)](https://docs.microsoft.com/en-us/dotnet/csharp/)
 
-WSAPPBak is a powerful and user-friendly WinUI 3 Windows application designed to Crack paid Windows Application. And Backup Application along with Certificates.
+WSAPPBak is a powerful and user-friendly WinUI 3 Windows application designed to Backup Windows Application. And Backup Application along with Certificates.
 
 ![WSAPPBak Demo](WSAppBak/WSAppBak/Assets/WSAppBak_Preview.png)
 
@@ -37,11 +37,11 @@ WSAPPBak is a powerful and user-friendly WinUI 3 Windows application designed to
 ## 📘 Usage Guide
 
 1. Launch WSAPPBak from your Start menu or desktop shortcut.
-2. Select the Application You want to crack from the dropdown menu.(Instructions are provided in Help Window)
+2. Select the Application You want to Backup from the dropdown menu.(Instructions are provided in Help Window)
 3. Choose a destination.
 4. Click "Start" and wait for the process to complete.
 
-### To Install Cracked App:
+### To Install App:
 
 1. Open Output Folder.
 2. Install Certificates (Detailed Instruction are given in Help Window)

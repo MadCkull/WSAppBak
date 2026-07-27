@@ -41,8 +41,37 @@ namespace WSAppBak
         /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            m_window = new MainWindow();
-            m_window.Activate();
+            this.UnhandledException += App_UnhandledException;
+            try
+            {
+                 m_window = new MainWindow();
+                 m_window.Activate();
+            }
+            catch (Exception ex)
+            {
+                LogException(ex);
+                throw;
+            }
+        }
+
+        private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+        {
+            LogException(e.Exception);
+            // e.Handled = true; // Optional: try to keep app alive? For now better to let it crash but log.
+        }
+
+        private void LogException(Exception ex)
+        {
+            try
+            {
+                string logPath = System.IO.Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, "startup_error.log");
+                string message = $"[{DateTime.Now}] Crash: {ex.Message}\nStack Trace: {ex.StackTrace}\n\n";
+                File.AppendAllText(logPath, message);
+            }
+            catch
+            {
+                // Last resort if logging fails
+            }
         }
 
         private Window m_window;
