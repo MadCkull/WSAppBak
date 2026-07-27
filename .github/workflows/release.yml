@@ -1,0 +1,63 @@
+name: Build and Release WSAppBak
+
+on:
+  push:
+    tags:
+      - "v*.*.*" # Triggers when a version tag like v2.0.0 is pushed
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.1.3
+
+    - name: Restore NuGet Packages
+      run: msbuild WSAppBak/WSAppBak.sln /t:Restore /p:Configuration=Release /p:Platform=x64
+
+    - name: Decode Signing Certificate
+      run: |
+        $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.APP_CERTIFICATE_BASE64 }}")
+        [IO.File]::WriteAllBytes("WSAppBak\WSAppBak (Package)\WSAppBak_SelfSigned.pfx", $pfx_cert_byte)
+
+    - name: Build MSIX Bundle
+      run: >
+        msbuild "WSAppBak/WSAppBak (Package)/WSAppBak (Package).wapproj"
+        /p:Configuration=Release
+        /p:Platform=x64
+        /p:UapAppxPackageBuildMode=SideloadOnly
+        /p:AppxBundle=Always
+        /p:AppxBundlePlatforms="x64|arm64"
+        /p:AppxPackageDir="${{ github.workspace }}\AppxPackages\"
+        /p:PackageCertificateKeyFile="WSAppBak_SelfSigned.pfx"
+        /p:PackageCertificatePassword="${{ secrets.APP_CERTIFICATE_PASSWORD }}"
+
+    - name: Build Portable ZIP (Unpackaged)
+      run: |
+        dotnet publish "WSAppBak\WSAppBak\WSAppBak.csproj" -c Release -r win-x64 --self-contained -p:WindowsPackageType=None -o "${{ github.workspace }}\Portable_x64"
+        Compress-Archive -Path "${{ github.workspace }}\Portable_x64\*" -DestinationPath "${{ github.workspace }}\WSAppBak_Portable_x64.zip"
+
+    - name: Find MSIX Bundle
+      id: find_msix
+      run: |
+        $msix = Get-ChildItem -Path "${{ github.workspace }}\AppxPackages" -Filter *.msixbundle -Recurse | Select-Object -First 1
+        echo "MSIX_PATH=$($msix.FullName)" >> $env:GITHUB_ENV
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          ${{ env.MSIX_PATH }}
+          ${{ github.workspace }}\WSAppBak_Portable_x64.zip
+          WSAppBak_Certificate.cer
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
