@@ -43,7 +43,7 @@ jobs:
 
     - name: Build Portable ZIP (Unpackaged)
       run: |
-        dotnet publish "WSAppBak\WSAppBak\WSAppBak.csproj" -c Release -r win-x64 --self-contained -p:WindowsPackageType=None -o "${{ github.workspace }}\Portable_x64"
+        msbuild "WSAppBak\WSAppBak\WSAppBak.csproj" /t:Publish /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win10-x64 /p:PublishDir="${{ github.workspace }}\Portable_x64"
         Compress-Archive -Path "${{ github.workspace }}\Portable_x64\*" -DestinationPath "${{ github.workspace }}\WSAppBak_Portable_x64.zip"
 
     - name: Find MSIX Bundle
