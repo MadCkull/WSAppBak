@@ -45,7 +45,7 @@ jobs:
 
     - name: Build Portable ZIP (Unpackaged)
       run: |
-        msbuild "WSAppBak\WSAppBak\WSAppBak.csproj" /t:Publish /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win10-x64 /p:PublishDir="${{ github.workspace }}\Portable_x64"
+        msbuild "WSAppBak\WSAppBak\WSAppBak.csproj" /t:Publish /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win10-x64 /p:WindowsPackageType=None /p:WindowsAppSDKSelfContained=true /p:PublishDir="${{ github.workspace }}\Portable_x64"
         Compress-Archive -Path "${{ github.workspace }}\Portable_x64\*" -DestinationPath "${{ github.workspace }}\WSAppBak_Portable_x64.zip"
 
     - name: Prepare Files for Release
