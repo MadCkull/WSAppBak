@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    permissions:
+      contents: write
 
     steps:
     - name: Checkout Code
@@ -46,19 +48,18 @@ jobs:
         msbuild "WSAppBak\WSAppBak\WSAppBak.csproj" /t:Publish /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win10-x64 /p:PublishDir="${{ github.workspace }}\Portable_x64"
         Compress-Archive -Path "${{ github.workspace }}\Portable_x64\*" -DestinationPath "${{ github.workspace }}\WSAppBak_Portable_x64.zip"
 
-    - name: Find MSIX Bundle
-      id: find_msix
+    - name: Prepare Files for Release
       run: |
         $msix = Get-ChildItem -Path "${{ github.workspace }}\AppxPackages" -Filter *.msixbundle -Recurse | Select-Object -First 1
-        echo "MSIX_PATH=$($msix.FullName)" >> $env:GITHUB_ENV
+        Copy-Item -Path $msix.FullName -Destination "${{ github.workspace }}\WSAppBak_x64_arm64.msixbundle"
 
     - name: Create GitHub Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         generate_release_notes: true
         files: |
-          ${{ env.MSIX_PATH }}
-          ${{ github.workspace }}\WSAppBak_Portable_x64.zip
+          WSAppBak_x64_arm64.msixbundle
+          WSAppBak_Portable_x64.zip
           WSAppBak_Certificate.cer
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
