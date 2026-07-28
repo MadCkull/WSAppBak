@@ -45,21 +45,53 @@ jobs:
 
     - name: Build Portable ZIP (Unpackaged)
       run: |
+        $tagName = "${{ github.ref_name }}"
+        $portableZipName = "WSAppBak $tagName (Portable - x64).zip"
         msbuild "WSAppBak\WSAppBak\WSAppBak.csproj" /t:Publish /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win10-x64 /p:WindowsPackageType=None /p:WindowsAppSDKSelfContained=true /p:PublishDir="${{ github.workspace }}\Portable_x64"
-        Compress-Archive -Path "${{ github.workspace }}\Portable_x64\*" -DestinationPath "${{ github.workspace }}\WSAppBak_Portable_x64.zip"
+        Compress-Archive -Path "${{ github.workspace }}\Portable_x64\*" -DestinationPath "${{ github.workspace }}\$portableZipName"
+        echo "PORTABLE_ZIP=$portableZipName" >> $env:GITHUB_ENV
 
-    - name: Prepare Files for Release
+    - name: Prepare Installer ZIP
       run: |
+        $tagName = "${{ github.ref_name }}"
+        $msixName = "WSAppBak ${tagName}.msixbundle"
+        $installerZipName = "WSAppBak $tagName (x64-ARM64).zip"
+        
+        # Create staging directory
+        $stagingDir = "${{ github.workspace }}\InstallerStaging"
+        New-Item -ItemType Directory -Path $stagingDir
+        
+        # Move and rename MSIX
         $msix = Get-ChildItem -Path "${{ github.workspace }}\AppxPackages" -Filter *.msixbundle -Recurse | Select-Object -First 1
-        Copy-Item -Path $msix.FullName -Destination "${{ github.workspace }}\WSAppBak_x64_arm64.msixbundle"
+        Copy-Item -Path $msix.FullName -Destination "$stagingDir\$msixName"
+        
+        # Copy Certificate
+        Copy-Item -Path "${{ github.workspace }}\WSAppBak_Certificate.cer" -Destination "$stagingDir\WSAppBak Certificate.cer"
+        
+        # Create Install Instructions
+        $instructions = @"
+        HOW TO INSTALL WSAppBak
+
+        1. Double-click the 'WSAppBak Certificate.cer' file.
+        2. Click 'Install Certificate...'.
+        3. Select 'Local Machine' and click Next.
+        4. Select 'Place all certificates in the following store' and click 'Browse'.
+        5. Choose 'Trusted People' and click OK, then Next, then Finish.
+        6. Now you can double-click '$msixName' to install the app!
+        "@
+        Set-Content -Path "$stagingDir\Install Instructions.txt" -Value $instructions
+        
+        # Create ZIP
+        Compress-Archive -Path "$stagingDir\*" -DestinationPath "${{ github.workspace }}\$installerZipName"
+        
+        echo "INSTALLER_ZIP=$installerZipName" >> $env:GITHUB_ENV
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
         generate_release_notes: true
         files: |
-          WSAppBak_x64_arm64.msixbundle
-          WSAppBak_Portable_x64.zip
-          WSAppBak_Certificate.cer
+          ${{ env.PORTABLE_ZIP }}
+          ${{ env.INSTALLER_ZIP }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
