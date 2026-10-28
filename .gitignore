@@ -368,3 +368,5 @@ portfolio/
 
 # Force include Properties (needed for PublishProfiles)
 !WSAppBak/WSAppBak/Properties/
+!WSAppBak/WSAppBak/Properties/PublishProfiles/*.pubxml
+/Portable_x64

@@ -137,4 +137,22 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+
+  <!-- Windows App SDK 1.7 generates the unpackaged PRI via MRT Core, but only
+       its MSIX targets add it to the .NET publish list. Without this file the
+       portable app crashes in Microsoft.UI.Xaml before displaying a window.
+       Keep the generated PRI (including embedded XAML), not a cached copy. -->
+  <Target Name="PublishUnpackagedResources"
+          BeforeTargets="ComputeResolvedFilesToPublishList"
+          DependsOnTargets="_GenerateProjectPriFile"
+          Condition="'$(WindowsPackageType)' == 'None'">
+    <Error Condition="!Exists('$(ProjectPriFullPath)')"
+           Text="Portable publish requires the generated application resource index: $(ProjectPriFullPath)" />
+    <ItemGroup>
+      <ResolvedFileToPublish Include="$(ProjectPriFullPath)">
+        <RelativePath>$(ProjectPriFileName)</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </ResolvedFileToPublish>
+    </ItemGroup>
+  </Target>
 </Project>

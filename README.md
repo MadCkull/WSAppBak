@@ -34,6 +34,53 @@ WSAPPBak is a powerful and user-friendly WinUI 3 Windows application designed to
 2. Open solution in Visual Studio
 3. Build & Run.
 
+### Building and checking the portable ZIP
+
+Use Visual Studio MSBuild with the .NET SDK and Windows/WinUI build tools installed:
+
+```powershell
+./scripts/Build-Portable.ps1 -Version dev -SmokeTest
+```
+
+The script builds an x64 app with both runtimes included, uses separate portable
+intermediates, and validates a freshly extracted ZIP before saving it under
+`artifacts/portable/`. Use a new version label or output folder for each build.
+The smoke test opens a window briefly and requires a Windows desktop session.
+
+To check an already extracted download:
+
+```powershell
+./scripts/Test-Portable.ps1 -Path 'C:\path\to\extracted-app' -Launch
+```
+
+Keep the entire extracted folder together, including `WSAppBak.pri`. The v2.0.0
+portable release omitted that generated resource index, causing a startup crash
+before the window appeared (issues #15 and #16). Replacing framework DLLs or
+installing extra runtimes does not supply the missing application resources.
+
+
+### Building the MSIX installer
+
+On Windows with Visual Studio's .NET and Windows packaging tools installed:
+
+```powershell
+./scripts/Build-MSIX.ps1
+```
+
+This restores dependencies, builds an unsigned x64/ARM64 bundle, and checks its
+resources, native architectures, included .NET runtimes, and dependency packages.
+Outputs are in a fresh directory under `artifacts/msix/`. Unsigned bundles are
+for build validation; installation requires signing.
+
+For a signed build, set `WSAPPBAK_CERTIFICATE_PASSWORD` in your local environment
+and pass `-CertificatePath 'C:\path\to\signing.pfx'`. Keep the PFX and password
+out of Git. The release workflow uses GitHub secrets and includes the public
+signing certificate, `Install.ps1`, and the `Dependencies` directory in its ZIP.
+After trusting the certificate, run `Install.ps1` as the intended Windows user
+to install the matching dependencies and application together.
+
+See [MSIX validation notes](docs/msix-validation.md) for the reproduced failures,
+test results, and remaining platform checks.
 
 ## 📘 Usage Guide
 

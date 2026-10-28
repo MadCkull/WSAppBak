@@ -7,48 +7,39 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2022
     permissions:
       contents: write
 
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 6.0.x
 
     - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1.1.3
-
-    - name: Restore NuGet Packages
-      run: msbuild WSAppBak.sln /t:Restore /p:Configuration=Release /p:Platform=x64
+      uses: microsoft/setup-msbuild@v2
 
     - name: Decode Signing Certificate
+      env:
+        CERTIFICATE_BASE64: ${{ secrets.APP_CERTIFICATE_BASE64 }}
       run: |
-        $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.APP_CERTIFICATE_BASE64 }}")
+        $pfx_cert_byte = [System.Convert]::FromBase64String($env:CERTIFICATE_BASE64)
         [IO.File]::WriteAllBytes("WSAppBak\WSAppBak (Package)\WSAppBak_SelfSigned.pfx", $pfx_cert_byte)
 
     - name: Build MSIX Bundle
-      run: >
-        msbuild "WSAppBak/WSAppBak (Package)/WSAppBak (Package).wapproj"
-        /p:Configuration=Release
-        /p:Platform=x64
-        /p:UapAppxPackageBuildMode=SideloadOnly
-        /p:AppxBundle=Always
-        /p:AppxBundlePlatforms="x64|arm64"
-        /p:AppxPackageDir="${{ github.workspace }}\AppxPackages\"
-        /p:PackageCertificateKeyFile="WSAppBak_SelfSigned.pfx"
-        /p:PackageCertificatePassword="${{ secrets.APP_CERTIFICATE_PASSWORD }}"
+      env:
+        WSAPPBAK_CERTIFICATE_PASSWORD: ${{ secrets.APP_CERTIFICATE_PASSWORD }}
+      run: ./scripts/Build-MSIX.ps1 -OutputRoot "${{ github.workspace }}\AppxPackages" -CertificatePath "WSAppBak\WSAppBak (Package)\WSAppBak_SelfSigned.pfx"
 
     - name: Build Portable ZIP (Unpackaged)
       run: |
         $tagName = "${{ github.ref_name }}"
         $portableZipName = "WSAppBak $tagName (Portable - x64).zip"
-        msbuild "WSAppBak\WSAppBak\WSAppBak.csproj" /t:Publish /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win10-x64 /p:WindowsPackageType=None /p:WindowsAppSDKSelfContained=true /p:PublishDir="${{ github.workspace }}\Portable_x64"
-        Compress-Archive -Path "${{ github.workspace }}\Portable_x64\*" -DestinationPath "${{ github.workspace }}\$portableZipName"
+        ./scripts/Build-Portable.ps1 -Version $tagName -OutputRoot "${{ github.workspace }}" -SmokeTest
         echo "PORTABLE_ZIP=$portableZipName" >> $env:GITHUB_ENV
 
     - name: Prepare Installer ZIP
@@ -62,11 +53,17 @@ jobs:
         New-Item -ItemType Directory -Path $stagingDir
         
         # Move and rename MSIX
-        $msix = Get-ChildItem -Path "${{ github.workspace }}\AppxPackages" -Filter *.msixbundle -Recurse | Select-Object -First 1
+        $bundles = @(Get-ChildItem -Path "${{ github.workspace }}\AppxPackages" -Filter *.msixbundle -Recurse)
+        if ($bundles.Count -ne 1) { throw 'Expected exactly one validated MSIX bundle.' }
+        $msix = $bundles[0]
         Copy-Item -Path $msix.FullName -Destination "$stagingDir\$msixName"
+        Copy-Item -LiteralPath (Join-Path $msix.DirectoryName 'Dependencies') -Destination "$stagingDir\Dependencies" -Recurse
+        Copy-Item -LiteralPath 'scripts\Install-MSIX.ps1' -Destination "$stagingDir\Install.ps1"
         
         # Copy Certificate
-        Copy-Item -Path "${{ github.workspace }}\WSAppBak_Certificate.cer" -Destination "$stagingDir\WSAppBak Certificate.cer"
+        $signature = Get-AuthenticodeSignature -LiteralPath $msix.FullName
+        if (!$signature.SignerCertificate) { throw 'The release bundle must be signed.' }
+        [IO.File]::WriteAllBytes("$stagingDir\WSAppBak Certificate.cer", $signature.SignerCertificate.Export([Security.Cryptography.X509Certificates.X509ContentType]::Cert))
         
         # Create Install Instructions
         $instructions = @"
@@ -77,7 +74,9 @@ jobs:
         3. Select 'Local Machine' and click Next.
         4. Select 'Place all certificates in the following store' and click 'Browse'.
         5. Choose 'Trusted People' and click OK, then Next, then Finish.
-        6. Now you can double-click '$msixName' to install the app!
+        6. Right-click 'Install.ps1' and choose 'Run with PowerShell' to install the
+           bundle and the included dependencies for your PC's architecture.
+           Run this step as your normal Windows user.
         "@
         Set-Content -Path "$stagingDir\Install Instructions.txt" -Value $instructions
         
