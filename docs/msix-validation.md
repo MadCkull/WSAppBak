@@ -46,8 +46,11 @@ Validated locally on 28 October 2026. These changes are not published.
 
 Local build tools: Visual Studio MSBuild 17.14.8, .NET SDK 9.0.300 targeting
 .NET 6, Windows App SDK 1.7.250606001 and Windows SDK BuildTools 10.0.26100.4188.
-The GitHub workflows select .NET SDK 6 and Windows Server 2022; the hosted jobs
-have not been run in this session.
+The GitHub workflows install .NET SDK 6 on Windows Server 2022, but SDK selection
+uses the newest installed SDK. The hosted runner used SDK 10.0.113 and MSBuild
+17.14.60. Both checks passed for commit `43188e2`:
+[MSIX packaging](https://github.com/MadCkull/WSAppBak/actions/runs/40782591810) and
+[portable build and launch](https://github.com/MadCkull/WSAppBak/actions/runs/40782591817).
 
 The Sandbox was Windows 11 Enterprise Insider, reporting version 10.0.26100
 (desktop watermark 26100.9750). Networking and clipboard redirection were
@@ -73,6 +76,6 @@ The candidate retains manifest version 2.0.0.0. It is a local test artifact, not
 a versioned release or an upgrade test against an already installed 2.0.0.0.
 
 Remaining checks: runtime testing on ARM64 hardware, stable Windows 11 and
-Windows 10; hosted CI/release execution; and an appropriately versioned release
+Windows 10; signed release execution; and an appropriately versioned release
 before closing issues as released fixes. App export, patching, and third-party
 package installation are outside this packaging/startup validation.

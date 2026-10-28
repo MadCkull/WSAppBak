@@ -79,6 +79,11 @@ signing certificate, `Install.ps1`, and the `Dependencies` directory in its ZIP.
 After trusting the certificate, run `Install.ps1` as the intended Windows user
 to install the matching dependencies and application together.
 
+To prepare a release, run the **Prepare WSAppBak release** GitHub Actions workflow
+with the matching version (for example `v2.0.1`). It verifies the application and
+MSIX versions, builds both distributions, and saves a draft release with release
+notes and SHA-256 checksums. Publishing that draft is a separate step.
+
 See [MSIX validation notes](docs/msix-validation.md) for the reproduced failures,
 test results, and remaining platform checks.
 

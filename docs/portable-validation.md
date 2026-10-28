@@ -51,7 +51,7 @@ SHA-256: `615164A5152F0CC6BF808096F57FF85F0CD7E919FE82EFAD803865865AB54879`.
 | MSIX-only evaluation of the new target | Skipped successfully |
 
 Local builds used Visual Studio MSBuild 17.14 and .NET SDK 9.0.300 targeting
-.NET 6. The workflows continue using .NET SDK 6. The separate MSIX build failure
+.NET 6. Hosted CI installs SDK 6 but selected the runner's SDK 10.0.113. The separate MSIX build failure
 originally reproduced with the unmodified project has since been diagnosed and
 fixed; see [MSIX validation notes](msix-validation.md). The portable publish target
 remains restricted to unpackaged builds.
@@ -60,7 +60,9 @@ remains restricted to unpackaged builds.
 
 - Run the candidate on Windows 10 22H2 and a stable Windows 11 machine. Both
   currently tested environments are Windows 11 Insider builds.
-- Run the hosted portable CI and full release workflow.
+- Hosted portable CI passed, including extracted-ZIP launch, for `43188e2`:
+  https://github.com/MadCkull/WSAppBak/actions/runs/40782591817. The signed release
+  workflow is the next release check.
 - Publish a tested replacement before closing #15 and #16 as released fixes.
 
 These checks concern portable packaging and startup. Exporting/signing a

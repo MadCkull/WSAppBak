@@ -1,9 +1,19 @@
-name: Build and Release WSAppBak
+name: Prepare WSAppBak release
 
 on:
   push:
     tags:
-      - "v*.*.*" # Triggers when a version tag like v2.0.0 is pushed
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version matching the manifest (for example v2.0.1)
+        required: true
+        type: string
+
+concurrency:
+  group: release-${{ inputs.version || github.ref_name }}
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -14,6 +24,19 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
+
+    - name: Validate release version
+      env:
+        REQUESTED_VERSION: ${{ inputs.version || github.ref_name }}
+      run: |
+        if ($env:REQUESTED_VERSION -notmatch '^v(\d+)\.(\d+)\.(\d+)$') { throw 'Use a version such as v2.0.1.' }
+        $version = $env:REQUESTED_VERSION.Substring(1)
+        [xml]$manifest = Get-Content 'WSAppBak/WSAppBak (Package)/Package.appxmanifest'
+        [xml]$project = Get-Content 'WSAppBak/WSAppBak/WSAppBak.csproj'
+        if ($manifest.Package.Identity.Version -ne "$version.0") { throw 'Release and MSIX manifest versions differ.' }
+        if ($project.Project.PropertyGroup.Version -notcontains $version) { throw 'Release and application versions differ.' }
+        if (!(Test-Path "docs/release-notes/$env:REQUESTED_VERSION.md")) { throw 'Release notes are missing.' }
+        "RELEASE_TAG=$env:REQUESTED_VERSION" >> $env:GITHUB_ENV
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
@@ -37,14 +60,14 @@ jobs:
 
     - name: Build Portable ZIP (Unpackaged)
       run: |
-        $tagName = "${{ github.ref_name }}"
+        $tagName = $env:RELEASE_TAG
         $portableZipName = "WSAppBak $tagName (Portable - x64).zip"
         ./scripts/Build-Portable.ps1 -Version $tagName -OutputRoot "${{ github.workspace }}" -SmokeTest
         echo "PORTABLE_ZIP=$portableZipName" >> $env:GITHUB_ENV
 
     - name: Prepare Installer ZIP
       run: |
-        $tagName = "${{ github.ref_name }}"
+        $tagName = $env:RELEASE_TAG
         $msixName = "WSAppBak ${tagName}.msixbundle"
         $installerZipName = "WSAppBak $tagName (x64-ARM64).zip"
         
@@ -85,12 +108,35 @@ jobs:
         
         echo "INSTALLER_ZIP=$installerZipName" >> $env:GITHUB_ENV
 
-    - name: Create GitHub Release
+    - name: Record release checksums
+      run: |
+        @($env:PORTABLE_ZIP, $env:INSTALLER_ZIP) | ForEach-Object {
+          $hash = Get-FileHash -LiteralPath $_ -Algorithm SHA256
+          "$($hash.Hash.ToLowerInvariant())  $([IO.Path]::GetFileName($_))"
+        } | Set-Content SHA256SUMS.txt
+
+    - name: Save release artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: WSAppBak-${{ env.RELEASE_TAG }}-release
+        path: |
+          ${{ env.PORTABLE_ZIP }}
+          ${{ env.INSTALLER_ZIP }}
+          SHA256SUMS.txt
+        if-no-files-found: error
+
+    - name: Prepare draft GitHub release
       uses: softprops/action-gh-release@v2
       with:
-        generate_release_notes: true
+        tag_name: ${{ env.RELEASE_TAG }}
+        target_commitish: ${{ github.sha }}
+        name: WSAppBak ${{ env.RELEASE_TAG }}
+        draft: true
+        body_path: docs/release-notes/${{ env.RELEASE_TAG }}.md
+        fail_on_unmatched_files: true
         files: |
           ${{ env.PORTABLE_ZIP }}
           ${{ env.INSTALLER_ZIP }}
+          SHA256SUMS.txt
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
